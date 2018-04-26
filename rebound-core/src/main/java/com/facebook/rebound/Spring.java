@@ -27,32 +27,32 @@ public class Spring {
     private SpringConfig mSpringConfig;
     private boolean mOvershootClampingEnabled;
 
-    // storage for the current and prior physics state while integration is occurring
-    private static class PhysicsState {
-        double position;
-        double velocity;
+    // storage for the current and prior(之前的) physics state while integration(整合，一体化) is occurring
+    private static class PhysicsState {//物理状态
+        double position;//位置
+        double velocity;//速度
     }
 
     // unique id for the spring in the system
     private final String mId;
-    // all physics simulation objects are final and reused in each processing pass
+    // all physics simulation objects are final and reused in each processing pass(在每个处理过程中)
     private final PhysicsState mCurrentState = new PhysicsState();
     private final PhysicsState mPreviousState = new PhysicsState();
     private final PhysicsState mTempState = new PhysicsState();
-    private double mStartValue;
+    private double mStartValue;// TODO: 2018/4/26 to un,不是应该用两个数值来表示吗？？？
     private double mEndValue;
-    private boolean mWasAtRest = true;
-    // thresholds for determining when the spring is at rest
-    private double mRestSpeedThreshold = 0.005;
+    private boolean mWasAtRest = true;//是否处于静止状态 // TODO: 2018/4/26 静止状态包含两种？？未开始的静止状态和弹簧拉伸到最长状态时的那个瞬间静止的状态？？？？？？？？？？？ to un
+    // thresholds(临界值) for determining when the spring is at rest
+    private double mRestSpeedThreshold = 0.005;//根据速度来判断该spring是否处于rest状态
     private double mDisplacementFromRestThreshold = 0.005;
     private double mTimeAccumulator = 0;
     private final CopyOnWriteArraySet<SpringListener> mListeners =
-            new CopyOnWriteArraySet<SpringListener>();
+            new CopyOnWriteArraySet<>();
 
     private final BaseSpringSystem mSpringSystem;
 
     /**
-     * create a new spring
+     * create a new spring(Spring只能由BaseSpringSystem或者它的子类来实现)
      */
     Spring(BaseSpringSystem springSystem) {
         if (springSystem == null) {
@@ -97,7 +97,7 @@ public class Spring {
     }
 
     /**
-     * retrieve the spring config for this spring
+     * retrieve(检索) the spring config for this spring
      *
      * @return the SpringConfig applied to this spring
      */
@@ -106,13 +106,12 @@ public class Spring {
     }
 
     /**
-     * Set the displaced value to determine the displacement for the spring from the rest value.
-     * This value is retained and used to calculate the displacement ratio.
-     * The default signature also sets the Spring at rest to facilitate the common behavior of moving
-     * a spring to a new position.
+     * Set the displaced(被取代的) value to determine the displacement(位移) for the spring from the rest value.
+     * This value is retained(保留) and used to calculate the displacement(位移) ratio(比率).
+     * The default signature also sets the Spring at rest to facilitate the common behavior of moving a spring to a new position.
      *
      * @param currentValue the new start and current value for the spring
-     * @return the spring for chaining
+     * @return the spring for chaining(链接，束缚)
      */
     public Spring setCurrentValue(double currentValue) {
         return setCurrentValue(currentValue, true);
@@ -121,9 +120,9 @@ public class Spring {
     /**
      * The full signature for setCurrentValue includes the option of not setting the spring at rest
      * after updating its currentValue. Passing setAtRest false means that if the endValue of the
-     * spring is not equal to the currentValue, the physics system will start iterating to resolve
-     * the spring to the end value. This is almost never the behavior that you want, so the default
-     * setCurrentValue signature passes true.
+     * spring is not equal to the currentValue, the physics system will start iterating(迭代，循环)
+     * to resolve the spring to the end value. This is almost never the behavior that you want, so
+     * the default setCurrentValue signature passes true.
      *
      * @param currentValue the new start and current value for the spring
      * @param setAtRest    optionally set the spring at rest after updating its current value.
@@ -131,9 +130,9 @@ public class Spring {
      * @return the spring for chaining
      */
     public Spring setCurrentValue(double currentValue, boolean setAtRest) {
-        mStartValue = currentValue;
+        mStartValue = currentValue;//// TODO: 2018/4/26  既然CurrentState中有position参数，那么这个还有什么意义？？
         mCurrentState.position = currentValue;
-        mSpringSystem.activateSpring(this.getId());
+        mSpringSystem.activateSpring(this.getId());//根据SpringId来启动Spring
         for (SpringListener listener : mListeners) {
             listener.onSpringUpdate(this);
         }
@@ -293,7 +292,7 @@ public class Spring {
     }
 
     /**
-     * Check if the spring is overshooting beyond its target.
+     * Check if the spring is overshooting(过度,超越) beyond its target.
      *
      * @return true if the spring is overshooting its target
      */
@@ -304,12 +303,12 @@ public class Spring {
     }
 
     /**
-     * advance the physics simulation in SOLVER_TIMESTEP_SEC sized chunks to fulfill the required
+     * advance(推进) the physics simulation in SOLVER_TIMESTEP_SEC sized chunks(块) to fulfill(实现,满足) the required
      * realTimeDelta.
-     * The math is inlined inside the loop since it made a huge performance impact when there are
-     * several springs being advanced.
+     * The math is inlined(内联的) inside the loop since it made a huge performance impact when there are
+     * several springs being advanced.好几个Spring同时在弹弹弹
      *
-     * @param realDeltaTime clock drift
+     * @param realDeltaTime clock drift(漂流)
      */
     void advance(double realDeltaTime) {
 
@@ -322,8 +321,8 @@ public class Spring {
             return;
         }
 
-        // clamp the amount of realTime to simulate to avoid stuttering in the UI. We should be able
-        // to catch up in a subsequent advance if necessary.
+        // clamp(夹紧,固定) the amount of realTime to simulate to avoid stuttering(口吃，结巴，打滑) in the UI. We should be able
+        // to catch up(赶上) in a subsequent(后续的) advance if necessary.
         double adjustedDeltaTime = realDeltaTime;
         if (realDeltaTime > MAX_DELTA_TIME_SEC) {
             adjustedDeltaTime = MAX_DELTA_TIME_SEC;
@@ -411,9 +410,9 @@ public class Spring {
             interpolate(mTimeAccumulator / SOLVER_TIMESTEP_SEC);
         }
 
-        // End the spring immediately if it is overshooting and overshoot clamping is enabled.
+        // End the spring immediately if it is overshooting(过度) and overshoot clamping is enabled.todo to un
         // Also make sure that if the spring was considered within a resting threshold that it's now
-        // snapped to its end value.
+        // snapped(突然中断,拍下了) to its end value.
         if (isAtRest() || (mOvershootClampingEnabled && isOvershooting())) {
             // Don't call setCurrentValue because that forces a call to onSpringUpdate
             if (tension > 0) {

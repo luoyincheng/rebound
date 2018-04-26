@@ -19,7 +19,7 @@ public interface SpringListener {
   void onSpringUpdate(Spring spring);
 
   /**
-   * called whenever the spring achieves a resting state
+   * called whenever the spring achieves(达到) a resting(静止) state
    * @param spring the spring that's now resting
    */
   void onSpringAtRest(Spring spring);
@@ -31,7 +31,7 @@ public interface SpringListener {
   void onSpringActivate(Spring spring);
 
   /**
-   * called whenever the spring notifies of displacement state changes
+   * called whenever the spring notifies of displacement(置换，取代) state changes
    * @param spring the spring whose end state has changed
    */
   void onSpringEndStateChange(Spring spring);
