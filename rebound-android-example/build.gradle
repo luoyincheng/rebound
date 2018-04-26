@@ -1,31 +1,32 @@
 apply plugin: 'com.android.application'
 
 dependencies {
-  compile project(':rebound-android')
+    implementation project(':rebound-android')
+    implementation project(path: ':rebound-core')
 }
 
 android {
 
-  compileSdkVersion Integer.parseInt(project.ANDROID_COMPILE_SDK_VERSION)
-  buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
+    compileSdkVersion Integer.parseInt(project.ANDROID_COMPILE_SDK_VERSION)
+    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
 
-  defaultConfig {
-    minSdkVersion Integer.parseInt(project.ANDROID_MIN_SDK)
-    targetSdkVersion Integer.parseInt(project.ANDROID_TARGET_SDK_VERSION)
-  }
-
-  signingConfigs {
-    debug {
-      storeFile file("debug.keystore")
-      storePassword "android"
-      keyAlias "androiddebugkey"
-      keyPassword "android"
+    defaultConfig {
+        minSdkVersion Integer.parseInt(project.ANDROID_MIN_SDK)
+        targetSdkVersion Integer.parseInt(project.ANDROID_TARGET_SDK_VERSION)
     }
-  }
 
-  buildTypes {
-    debug {
-      signingConfig signingConfigs.debug
+    signingConfigs {
+        debug {
+            storeFile file("debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
     }
-  }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+    }
 }

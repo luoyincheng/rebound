@@ -1,10 +1,11 @@
 buildscript {
   repositories {
     mavenCentral()
+      google()
   }
 
   dependencies {
-    classpath 'com.android.tools.build:gradle:1.2.3'
+    classpath 'com.android.tools.build:gradle:3.1.1'
   }
 }
 
@@ -14,7 +15,6 @@ import com.android.builder.core.BuilderConstants
 android {
 
   compileSdkVersion Integer.parseInt(project.ANDROID_COMPILE_SDK_VERSION)
-  buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
 
   defaultConfig {
     minSdkVersion 11
@@ -27,6 +27,7 @@ android {
       java.srcDirs = ['rebound-core/src/main/java', 'rebound-android/src/main/java']
     }
   }
+  buildToolsVersion '27.0.3'
 }
 
 // Create jar for distribution.
@@ -136,4 +137,8 @@ uploadArchives {
       }
     }
   }
+}
+
+repositories {
+    google()
 }
