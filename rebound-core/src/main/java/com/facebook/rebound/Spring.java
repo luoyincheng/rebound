@@ -469,7 +469,7 @@ public class Spring {
     }
 
     /**
-     * Check if this spring should be advanced by the system.  * The rule is if the spring is
+     * Check if this spring should be advanced(推进) by the system.  * The rule is if the spring is
      * currently at rest and it was at rest in the previous advance, the system can skip this spring
      *
      * @return should the system process this spring
@@ -479,10 +479,10 @@ public class Spring {
     }
 
     /**
-     * Check if the spring was at rest in the prior iteration. This is used for ensuring the ending
+     * Check if the spring was at rest in the prior iteration(在之前的动画中，该Spring有没有参与动画的执行). This is used for ensuring the ending
      * callbacks are fired as the spring comes to a rest.
      *
-     * @return true if the spring was at rest in the prior iteration
+     * @return true if the spring was at rest in the prior(之前的) iteration(迭代，反复)
      */
     public boolean wasAtRest() {
         return mWasAtRest;
@@ -490,8 +490,7 @@ public class Spring {
 
     /**
      * check if the current state is at rest
-     *
-     * @return is the spring at rest
+     * 【速度】 &&【偏移量】||【张力】同时满足才行，【张力】和【偏移量】是等价的
      */
     public boolean isAtRest() {
         return Math.abs(mCurrentState.velocity) <= mRestSpeedThreshold &&
@@ -502,19 +501,17 @@ public class Spring {
     /**
      * Set the spring to be at rest by making its end value equal to its current value and setting
      * velocity to 0.
-     *
-     * @return this object
      */
     public Spring setAtRest() {
-        mEndValue = mCurrentState.position;
+        mEndValue = mCurrentState.position;// TODO: 2018/4/26  为什么一个位置就可以？？？？？？？？？
         mTempState.position = mCurrentState.position;
         mCurrentState.velocity = 0;
         return this;
     }
 
     /**
-     * linear interpolation between the previous and current physics state based on the amount of
-     * timestep remaining after processing the rendering delta time in timestep sized chunks.
+     * linear interpolation(插值，插入) between the previous and current physics state based on the amount of
+     * timestep(步伐) remaining after processing the rendering delta time in timestep sized chunks.
      *
      * @param alpha from 0 to 1, where 0 is the previous state, 1 is the current state
      */
