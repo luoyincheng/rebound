@@ -57,7 +57,7 @@ public class PlaygroundActivity extends Activity implements AdapterView.OnItemCl
     private View mRootContainer;
     private ExampleListAdapter mAdapter;
     private ViewGroup mRootView;
-    private ExampleContainerView mCurrentExample;
+    private ExampleContainerView mCurrentExample;//extends FrameLayout
     private boolean mAnimating;
     private LayoutInflater mInflater;
 
@@ -71,7 +71,6 @@ public class PlaygroundActivity extends Activity implements AdapterView.OnItemCl
         mListView = (ListView) findViewById(R.id.list_view);
         mAdapter = new ExampleListAdapter();
         mListView.setAdapter(mAdapter);
-
         mListView.setOnItemClickListener(this);
     }
 
@@ -128,10 +127,16 @@ public class PlaygroundActivity extends Activity implements AdapterView.OnItemCl
         }
         mAnimating = true;
 
-        mCurrentExample = new ExampleContainerView(this);
+        mCurrentExample = new ExampleContainerView(this);//只要有Context就能构造出来一个View
         mCurrentExample.addView(sampleView);
         mRootView.addView(mCurrentExample);
 
+        /**
+         * reveal:显示,揭露
+         * <p>Causes the Runnable to be added to the message queue, to be run
+         * after the specified amount of time elapses.
+         * The runnable will be run on the user interface thread.</p>
+         */
         mCurrentExample.postDelayed(new Runnable() {
             @Override
             public void run() {

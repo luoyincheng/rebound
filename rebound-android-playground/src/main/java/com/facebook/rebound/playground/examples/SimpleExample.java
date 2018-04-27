@@ -29,60 +29,62 @@ import com.facebook.rebound.playground.R;
 
 public class SimpleExample extends FrameLayout {
 
-  private final BaseSpringSystem mSpringSystem = SpringSystem.create();
-  private final ExampleSpringListener mSpringListener = new ExampleSpringListener();
-  private final FrameLayout mRootView;
-  private final Spring mScaleSpring;
-  private final View mImageView;
+    private final BaseSpringSystem mSpringSystem = SpringSystem.create();
+    private final ExampleSpringListener mSpringListener = new ExampleSpringListener();
+    private final FrameLayout mRootView;
+    private final Spring mScaleSpring;
+    private final View mImageView;
 
-  public SimpleExample(Context context) {
-    this(context, null);
-  }
-
-  public SimpleExample(Context context, AttributeSet attrs) {
-    this(context, attrs, 0);
-  }
-
-  public SimpleExample(Context context, AttributeSet attrs, int defStyle) {
-    super(context, attrs, defStyle);
-    mScaleSpring = mSpringSystem.createSpring();
-    LayoutInflater inflater = LayoutInflater.from(context);
-    mRootView = (FrameLayout) inflater.inflate(R.layout.photo_scale_example, this, false);
-    mImageView = mRootView.findViewById(R.id.image_view);
-    mRootView.setOnTouchListener(new View.OnTouchListener() {
-      @Override
-      public boolean onTouch(View v, MotionEvent event) {
-        switch (event.getAction()) {
-          case MotionEvent.ACTION_DOWN:
-            mScaleSpring.setEndValue(1);
-            break;
-          case MotionEvent.ACTION_UP:
-          case MotionEvent.ACTION_CANCEL:
-            mScaleSpring.setEndValue(0);
-            break;
-        }
-        return true;
-      }
-    });
-    addView(mRootView);
-  }
-
-  @Override
-  protected void onAttachedToWindow() {
-    mScaleSpring.addListener(mSpringListener);
-  }
-
-  @Override
-  protected void onDetachedFromWindow() {
-    mScaleSpring.removeListener(mSpringListener);
-  }
-
-  private class ExampleSpringListener extends SimpleSpringListener {
-    @Override
-    public void onSpringUpdate(Spring spring) {
-      float mappedValue = (float) SpringUtil.mapValueFromRangeToRange(spring.getCurrentValue(), 0, 1, 1, 0.5);
-      mImageView.setScaleX(mappedValue);
-      mImageView.setScaleY(mappedValue);
+    public SimpleExample(Context context) {
+        this(context, null);
     }
-  }
+
+    public SimpleExample(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public SimpleExample(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        mScaleSpring = mSpringSystem.createSpring();
+        LayoutInflater inflater = LayoutInflater.from(context);
+        mRootView = (FrameLayout) inflater.inflate(R.layout.photo_scale_example, this, false);
+        mImageView = mRootView.findViewById(R.id.image_view);
+        mRootView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        mScaleSpring.setEndValue(1);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        mScaleSpring.setEndValue(0);
+                        break;
+                }
+                return true;
+            }
+        });
+        addView(mRootView);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        mScaleSpring.addListener(mSpringListener);
+    }
+
+    @Override
+    protected void onDetachedFromWlindow() {
+        super.onDetachedFromWindow();
+        mScaleSpring.removeListener(mSpringListener);
+    }
+
+    private class ExampleSpringListener extends SimpleSpringListener {
+        @Override
+        public void onSpringUpdate(Spring spring) {
+            float mappedValue = (float) SpringUtil.mapValueFromRangeToRange(spring.getCurrentValue(), 0, 1, 1, 0.5);
+            mImageView.setScaleX(mappedValue);
+            mImageView.setScaleY(mappedValue);
+        }
+    }
 }
