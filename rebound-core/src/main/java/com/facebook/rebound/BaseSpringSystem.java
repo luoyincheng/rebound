@@ -77,7 +77,7 @@ public class BaseSpringSystem {
     }
 
     /**
-     * return all the springs in the simulator
+     * return all the springs in the simulator(模拟器)
      */
     public List<Spring> getAllSprings() {
         Collection<Spring> collection = mSpringRegistry.values();
@@ -90,7 +90,7 @@ public class BaseSpringSystem {
     }
 
     /**
-     * Registers a Spring to this BaseSpringSystem so it can be iterated if active.
+     * Registers(登记) a Spring to this BaseSpringSystem so it can be iterated if active.
      */
     void registerSpring(Spring spring) {
         if (spring == null) {

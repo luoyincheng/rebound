@@ -263,7 +263,7 @@ public class Spring {
     }
 
     /**
-     * get the threshold of displacement from rest below which the spring should be considered at rest
+     * get the threshold(临界值,阀值) of displacement from rest below which the spring should be considered at rest
      *
      * @return displacement to consider resting below
      */
@@ -520,14 +520,6 @@ public class Spring {
         mCurrentState.velocity = mCurrentState.velocity * alpha + mPreviousState.velocity * (1 - alpha);
     }
 
-    /** listeners **/
-
-    /**
-     * add a listener
-     *
-     * @param newListener to add
-     * @return the spring for chaining
-     */
     public Spring addListener(SpringListener newListener) {
         if (newListener == null) {
             throw new IllegalArgumentException("newListener is required");
@@ -536,12 +528,6 @@ public class Spring {
         return this;
     }
 
-    /**
-     * remove a listener
-     *
-     * @param listenerToRemove to remove
-     * @return the spring for chaining
-     */
     public Spring removeListener(SpringListener listenerToRemove) {
         if (listenerToRemove == null) {
             throw new IllegalArgumentException("listenerToRemove is required");
@@ -550,18 +536,13 @@ public class Spring {
         return this;
     }
 
-    /**
-     * remove all of the listeners
-     *
-     * @return the spring for chaining
-     */
     public Spring removeAllListeners() {
         mListeners.clear();
         return this;
     }
 
     /**
-     * This method checks to see that the current spring displacement value is equal to the input,
+     * This method checks to see that the current spring displacement value(位移值，偏移量) is equal to the input,
      * accounting for the spring's rest displacement threshold.
      *
      * @param value The value to compare the spring value to
@@ -571,6 +552,5 @@ public class Spring {
     public boolean currentValueIsApproximately(double value) {
         return Math.abs(getCurrentValue() - value) <= getRestDisplacementThreshold();
     }
-
 }
 

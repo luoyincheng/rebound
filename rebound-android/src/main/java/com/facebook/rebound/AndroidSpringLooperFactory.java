@@ -17,7 +17,7 @@ import android.os.SystemClock;
 import android.view.Choreographer;
 
 /**
- * Android version of the spring looper that uses the most appropriate frame callback mechanism
+ * Android version of the spring looper that uses the most appropriate(适当的) frame callback mechanism
  * available. It uses Android's {@link Choreographer} when available, otherwise it uses a
  * {@link Handler}.
  */

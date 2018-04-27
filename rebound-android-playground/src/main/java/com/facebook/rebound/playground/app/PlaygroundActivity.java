@@ -36,212 +36,226 @@ import com.facebook.rebound.playground.examples.SpringScrollViewExample;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PlaygroundActivity extends Activity implements AdapterView.OnItemClickListener {
 
-  private static final List<Sample> SAMPLES = new ArrayList<Sample>();
+    private static final List<Sample> SAMPLES = new ArrayList<Sample>();
 
-  static {
-    SAMPLES.add(new Sample(SimpleExample.class, "Simple Example", "Scale a photo when you press and release"));
-    SAMPLES.add(new Sample(SpringScrollViewExample.class, "Scroll View", "A scroll view with spring physics"));
-    SAMPLES.add(new Sample(SpringChainExample.class, "SpringChain", "Drag any row in the list."));
-    SAMPLES.add(new Sample(PhotoGalleryExample.class, "Photo Gallery", "Tap on a photo to enlarge or minimize."));
-    SAMPLES.add(new Sample(BallExample.class, "Inertia Ball", "Toss the ball around the screen and watch it settle"));
-    SAMPLES.add(new Sample(OrigamiExample.class, "Origami Example", "Rebound port of an Origami composition"));
-  }
-
-  private ListView mListView;
-  private View mRootContainer;
-  private ExampleListAdapter mAdapter;
-  private ViewGroup mRootView;
-  private ExampleContainerView mCurrentExample;
-  private boolean mAnimating;
-  private LayoutInflater mInflater;
-
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_playground);
-    mInflater = LayoutInflater.from(this);
-    mRootView = (ViewGroup) findViewById(R.id.root);
-    mRootContainer = findViewById(R.id.root_container);
-    mListView = (ListView) findViewById(R.id.list_view);
-    mAdapter = new ExampleListAdapter();
-    mListView.setAdapter(mAdapter);
-
-    mListView.setOnItemClickListener(this);
-  }
-
-  @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    getMenuInflater().inflate(R.menu.playground, menu);
-    return true;
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    int id = item.getItemId();
-    if (id == R.id.action_settings) {
-      return true;
-    }
-    return super.onOptionsItemSelected(item);
-  }
-
-  @Override
-  public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-    if (mAnimating) {
-      return;
+    static {
+        SAMPLES.add(new Sample(SimpleExample.class, "Simple Example", "Scale a photo when you press and release"));
+        SAMPLES.add(new Sample(SpringScrollViewExample.class, "Scroll View", "A scroll view with spring physics"));
+        SAMPLES.add(new Sample(SpringChainExample.class, "SpringChain", "Drag any row in the list."));
+        SAMPLES.add(new Sample(PhotoGalleryExample.class, "Photo Gallery", "Tap on a photo to enlarge or minimize."));
+        SAMPLES.add(new Sample(BallExample.class, "Inertia Ball", "Toss the ball around the screen and watch it settle"));
+        SAMPLES.add(new Sample(OrigamiExample.class, "Origami Example", "Rebound port of an Origami composition"));
     }
 
-    Class<? extends View> clazz = SAMPLES.get(position).viewClass;
-    View sampleView = null;
-    try {
-      Constructor<? extends View> ctor = clazz.getConstructor(Context.class);
-      sampleView = ctor.newInstance(PlaygroundActivity.this);
-    } catch (NoSuchMethodException e) {
-      e.printStackTrace();
-    } catch (InvocationTargetException e) {
-      e.printStackTrace();
-    } catch (InstantiationException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
+    private ListView mListView;
+    private View mRootContainer;
+    private ExampleListAdapter mAdapter;
+    private ViewGroup mRootView;
+    private ExampleContainerView mCurrentExample;
+    private boolean mAnimating;
+    private LayoutInflater mInflater;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_playground);
+        mInflater = LayoutInflater.from(this);
+        mRootView = (ViewGroup) findViewById(R.id.root);
+        mRootContainer = findViewById(R.id.root_container);
+        mListView = (ListView) findViewById(R.id.list_view);
+        mAdapter = new ExampleListAdapter();
+        mListView.setAdapter(mAdapter);
+
+        mListView.setOnItemClickListener(this);
     }
 
-    if (sampleView == null) {
-      return;
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.playground, menu);
+        return true;
     }
-    mAnimating = true;
 
-    mCurrentExample = new ExampleContainerView(this);
-    mCurrentExample.addView(sampleView);
-    mRootView.addView(mCurrentExample);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
-    mCurrentExample.postDelayed(new Runnable() {
-      @Override
-      public void run() {
-        mCurrentExample.reveal(true, new ExampleContainerView.Callback() {
-          @Override
-          public void onProgress(double progress) {
-            float scale = (float) SpringUtil.mapValueFromRangeToRange(progress, 0, 1, 0.8, 1);
-            mRootContainer.setScaleX(scale);
-            mRootContainer.setScaleY(scale);
-            mRootContainer.setAlpha((float) progress);
-          }
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        if (mAnimating) {
+            return;
+        }
 
-          @Override
-          public void onEnd() {
-            mAnimating = false;
-          }
+        Class<? extends View> clazz = SAMPLES.get(position).viewClass;
+        View sampleView = null;
+        try {
+            /***
+             * {@code Constructor} provides information about, and access to, a single
+             * constructor for a class.
+             *
+             * <p>{@code Constructor} permits widening(拓宽,扩展) conversions(转换) to occur when matching the
+             * actual parameters to newInstance() with the underlying(根本的,潜在的,在下面的)
+             * constructor's formal(有条理的,正式的) parameters, but throws an
+             * {@code IllegalArgumentException} if a narrowing conversion would occur.
+             *
+             * @param <T> the class in which the constructor is declared(声明的，宣布的)
+             *
+             */
+            Constructor<? extends View> ctor = clazz.getConstructor(Context.class);//// TODO: 2018/4/27  to un
+            sampleView = ctor.newInstance(PlaygroundActivity.this);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        if (sampleView == null) {
+            return;
+        }
+        mAnimating = true;
+
+        mCurrentExample = new ExampleContainerView(this);
+        mCurrentExample.addView(sampleView);
+        mRootView.addView(mCurrentExample);
+
+        mCurrentExample.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mCurrentExample.reveal(true, new ExampleContainerView.Callback() {
+                    @Override
+                    public void onProgress(double progress) {
+                        float scale = (float) SpringUtil.mapValueFromRangeToRange(progress, 0, 1, 0.8, 1);
+                        mRootContainer.setScaleX(scale);
+                        mRootContainer.setScaleY(scale);
+                        mRootContainer.setAlpha((float) progress);
+                    }
+
+                    @Override
+                    public void onEnd() {
+                        mAnimating = false;
+                    }
+                });
+            }
+        }, 100);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mAnimating || mCurrentExample == null) {
+            return;
+        }
+        mAnimating = true;
+        mCurrentExample.hide(true, new ExampleContainerView.Callback() {
+            @Override
+            public void onProgress(double progress) {
+                float scale = (float) SpringUtil.mapValueFromRangeToRange(progress, 0, 1, 0.8, 1);
+                mRootContainer.setScaleX(scale);
+                mRootContainer.setScaleY(scale);
+                mRootContainer.setAlpha((float) progress);
+            }
+
+            @Override
+            public void onEnd() {
+                mAnimating = false;
+                mCurrentExample.clearCallback();
+                mRootView.removeView(mCurrentExample);
+                mCurrentExample = null;
+            }
         });
-      }
-    }, 100);
-  }
-
-  @Override
-  public void onBackPressed() {
-    if (mAnimating || mCurrentExample == null) {
-      return;
-    }
-    mAnimating = true;
-    mCurrentExample.hide(true, new ExampleContainerView.Callback() {
-      @Override
-      public void onProgress(double progress) {
-        float scale = (float) SpringUtil.mapValueFromRangeToRange(progress, 0, 1, 0.8, 1);
-        mRootContainer.setScaleX(scale);
-        mRootContainer.setScaleY(scale);
-        mRootContainer.setAlpha((float) progress);
-      }
-
-      @Override
-      public void onEnd() {
-        mAnimating = false;
-        mCurrentExample.clearCallback();
-        mRootView.removeView(mCurrentExample);
-        mCurrentExample = null;
-      }
-    });
-  }
-
-  private class ExampleListAdapter implements ListAdapter {
-
-    @Override
-    public void registerDataSetObserver(DataSetObserver observer) {}
-
-    @Override
-    public void unregisterDataSetObserver(DataSetObserver observer) {
     }
 
-    @Override
-    public int getCount() {
-      return SAMPLES.size();
+    private class ExampleListAdapter implements ListAdapter {
+
+        @Override
+        public void registerDataSetObserver(DataSetObserver observer) {
+        }
+
+        @Override
+        public void unregisterDataSetObserver(DataSetObserver observer) {
+        }
+
+        @Override
+        public int getCount() {
+            return SAMPLES.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return SAMPLES.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return true;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            RowView rowView;
+            if (convertView != null) {
+                rowView = (RowView) convertView;
+            } else {
+                rowView = new RowView(PlaygroundActivity.this);
+            }
+            rowView.setText(SAMPLES.get(position).text);
+            rowView.setSubtext(SAMPLES.get(position).subtext);
+            return rowView;
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            return 0;
+        }
+
+        @Override
+        public int getViewTypeCount() {
+            return 1;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return SAMPLES.isEmpty();
+        }
+
+        @Override
+        public boolean areAllItemsEnabled() {
+            return true;
+        }
+
+        @Override
+        public boolean isEnabled(int position) {
+            return true;
+        }
     }
 
-    @Override
-    public Object getItem(int position) {
-      return SAMPLES.get(position);
-    }
+    private static class Sample {
+        public Class<? extends View> viewClass;// TODO: 2018/4/27  to un
+        public String text;
+        public String subtext;
 
-    @Override
-    public long getItemId(int position) {
-      return position;
+        public Sample(Class<? extends View> viewClass, String text, String subtext) {
+            this.viewClass = viewClass;
+            this.text = text;
+            this.subtext = subtext;
+        }
     }
-
-    @Override
-    public boolean hasStableIds() {
-      return true;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-      RowView rowView;
-      if (convertView != null) {
-        rowView = (RowView) convertView;
-      } else {
-        rowView = new RowView(PlaygroundActivity.this);
-      }
-      rowView.setText(SAMPLES.get(position).text);
-      rowView.setSubtext(SAMPLES.get(position).subtext);
-      return rowView;
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-      return 0;
-    }
-
-    @Override
-    public int getViewTypeCount() {
-      return 1;
-    }
-
-    @Override
-    public boolean isEmpty() {
-      return SAMPLES.isEmpty();
-    }
-
-    @Override
-    public boolean areAllItemsEnabled() {
-      return true;
-    }
-
-    @Override
-    public boolean isEnabled(int position) {
-      return true;
-    }
-  }
-
-  private static class Sample {
-    public Class<? extends View> viewClass;
-    public String text;
-    public String subtext;
-
-    public Sample(Class<? extends View> viewClass, String text, String subtext) {
-      this.viewClass = viewClass;
-      this.text = text;
-      this.subtext = subtext;
-    }
-  }
 }
